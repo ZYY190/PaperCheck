@@ -5,7 +5,8 @@ out/
 
 # 运行样例时生成的答案文件
 samples/ans_*.txt
-3124004450/samples/ans_*.txt
+samples/ans.txt
+3124004450/samples/ans*.txt
 
 # IDE
 .idea/
