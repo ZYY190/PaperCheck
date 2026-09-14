@@ -63,7 +63,7 @@
 │     └─ 路径为空时抛出 E002 ✔
 └─ JUnit Vintage ✔
 
-Test run finished after 5280 ms
+Test run finished after 5277 ms
 [        11 containers found      ]
 [         0 containers skipped    ]
 [        11 containers started    ]
