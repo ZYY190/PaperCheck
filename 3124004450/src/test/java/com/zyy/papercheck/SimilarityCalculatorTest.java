@@ -103,6 +103,17 @@ class SimilarityCalculatorTest {
     }
 
     @Test
+    @DisplayName("抄袭句跨越原文句边界时仍然能被匹配")
+    void sentenceSpanningOriginalBoundaryIsMatched() {
+        // 抄袭版把原文第一句的后半段和第二句的前半段拼成了一句，
+        // 单句比对只能匹配到一部分，必须把相邻原文句合并起来才能完全匹配
+        String original = "今天天气很好，我们一起去公园散步吧。明天要下雨，记得带伞出门。";
+        String copied = "一起去公园散步吧明天要下雨";
+        double rate = calculator.calculate(original, copied);
+        assertTrue(rate > 0.9, "实际重复率: " + rate);
+    }
+
+    @Test
     @DisplayName("重复率始终落在 [0, 1] 区间内")
     void resultIsAlwaysWithinUnitInterval() {
         String[][] pairs = {

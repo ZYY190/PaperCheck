@@ -36,6 +36,9 @@ public final class SimilarityCalculator {
     /** 每个句子最多做多少次 LCS 精确比对，保证单句开销有硬上界。 */
     static final int MAX_LCS_PER_SENTENCE = 24;
 
+    /** 跨句匹配时最多合并的原文句数。 */
+    static final int MAX_MERGE_SPAN = 3;
+
     /** 句子长度相差超过该倍数时直接判定为不可能高度重复。 */
     static final int LENGTH_RATIO = 6;
 
@@ -130,13 +133,14 @@ public final class SimilarityCalculator {
         int[] sortedBuffer = new int[MAX_CANDIDATES];
         int[] bucketBuffer = new int[SentenceSegmenter.MAX_SENTENCE_LENGTH + 2];
         int[] startBuffer = new int[SentenceSegmenter.MAX_SENTENCE_LENGTH + 2];
+        int[] mergeBuffer = new int[MAX_MERGE_SPAN * SentenceSegmenter.MAX_SENTENCE_LENGTH];
         int matched = 0;
         int stampCounter = 0;
         for (int i = 0; i < copied.size(); i++) {
             stampCounter++;
             matched += bestMatch(copied.get(i), original, index, matcher, originalSingleChars,
                     hitCount, stamp, stampCounter, dfLimit, candidates,
-                    orderBuffer, frequencyBuffer, sortedBuffer, bucketBuffer, startBuffer);
+                    orderBuffer, frequencyBuffer, sortedBuffer, bucketBuffer, startBuffer, mergeBuffer);
         }
         return matched;
     }
@@ -159,13 +163,15 @@ public final class SimilarityCalculator {
      * @param sortedBuffer        复用的候选排序结果缓冲区
      * @param bucketBuffer        复用的计数排序桶
      * @param startBuffer         复用的计数排序起始位置数组
+     * @param mergeBuffer         跨句匹配时用于拼接原文句的缓冲区
      * @return 该句被判为重复的字符数
      */
     private int bestMatch(int[] sentence, List<int[]> original, NGramIndex index,
                           LcsMatcher matcher, Set<Integer> originalSingleChars,
                           int[] hitCount, int[] stamp, int stampCounter, int dfLimit,
                           CandidateBag candidates, int[] orderBuffer, int[] frequencyBuffer,
-                          int[] sortedBuffer, int[] bucketBuffer, int[] startBuffer) {
+                          int[] sortedBuffer, int[] bucketBuffer, int[] startBuffer,
+                          int[] mergeBuffer) {
         int length = sentence.length;
         if (length <= 0) {
             return 0;
@@ -194,6 +200,7 @@ public final class SimilarityCalculator {
         }
         orderByHitsDescending(candidates, hitCount, sortedBuffer, bucketBuffer, startBuffer);
         int best = 0;
+        int bestId = -1;
         int examined = 0;
         for (int k = 0; k < candidates.size && examined < MAX_LCS_PER_SENTENCE; k++) {
             int id = sortedBuffer[k];
@@ -221,9 +228,62 @@ public final class SimilarityCalculator {
             }
             if (value > best) {
                 best = value;
+                bestId = id;
                 if (best == minLength) {
                     // 已经完全包含，无需继续比较
                     break;
+                }
+            }
+        }
+        if (bestId >= 0 && best < length) {
+            // 删改可能让抄袭句跨越原文的句子边界（例如删掉半句后前后两句被拼到了一起），
+            // 此时单句比对只能匹配到一部分，需要把相邻的原文句合并起来再比一次。
+            best = Math.max(best, matchMerged(sentence, original, bestId, matcher, mergeBuffer, best));
+        }
+        return best;
+    }
+
+    /**
+     * 把最佳候选句与其相邻的原文句合并后重新比对，处理「抄袭句跨越原文句边界」的情况。
+     *
+     * <p>只在单句比对没能完全匹配时才调用，因此对绝大多数句子没有额外开销。</p>
+     *
+     * @param sentence   抄袭版句子
+     * @param original   原文句子
+     * @param center     最佳候选句的编号
+     * @param matcher    可复用的 LCS 计算器
+     * @param buffer     拼接缓冲区
+     * @param currentBest 当前的匹配长度
+     * @return 合并若干相邻句之后能取得的最大匹配长度
+     */
+    private int matchMerged(int[] sentence, List<int[]> original, int center,
+                            LcsMatcher matcher, int[] buffer, int currentBest) {
+        int best = currentBest;
+        int size = original.size();
+        for (int span = 2; span <= MAX_MERGE_SPAN; span++) {
+            for (int start = center - span + 1; start <= center; start++) {
+                if (start < 0 || start + span > size) {
+                    continue;
+                }
+                int total = 0;
+                for (int k = start; k < start + span; k++) {
+                    total += original.get(k).length;
+                }
+                if (total > buffer.length) {
+                    continue;
+                }
+                int position = 0;
+                for (int k = start; k < start + span; k++) {
+                    int[] part = original.get(k);
+                    System.arraycopy(part, 0, buffer, position, part.length);
+                    position += part.length;
+                }
+                int value = matcher.length(sentence, Arrays.copyOf(buffer, position));
+                if (value > best) {
+                    best = value;
+                    if (best == sentence.length) {
+                        return best;
+                    }
                 }
             }
         }
