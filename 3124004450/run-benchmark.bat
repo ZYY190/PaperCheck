@@ -1,10 +1,13 @@
 @echo off
-rem 性能基准测试：对比朴素整篇比对与分句+索引剪枝两种实现
+rem Benchmark: compare the naive whole-text comparison with the indexed implementation.
 setlocal
 cd /d "%~dp0"
 
-if defined JAVA_HOME (set "JAVAC=%JAVA_HOME%\bin\javac.exe") else (set "JAVAC=javac")
-if defined JAVA_HOME (set "JAVA=%JAVA_HOME%\bin\java.exe") else (set "JAVA=java")
+rem Prefer JAVA_HOME, but fall back to PATH if it does not contain the toolchain.
+set "JAVAC=javac"
+set "JAVA=java"
+if defined JAVA_HOME if exist "%JAVA_HOME%\bin\javac.exe" set "JAVAC=%JAVA_HOME%\bin\javac.exe"
+if defined JAVA_HOME if exist "%JAVA_HOME%\bin\java.exe" set "JAVA=%JAVA_HOME%\bin\java.exe"
 
 if not exist build\classes mkdir build\classes
 dir /s /b src\main\java\*.java > build\sources.txt
