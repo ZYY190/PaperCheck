@@ -1,0 +1,22 @@
+# 编译产物
+build/
+out/
+*.class
+
+# 运行样例时生成的答案文件
+samples/ans_*.txt
+3124004450/samples/ans_*.txt
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# 操作系统
+Thumbs.db
+desktop.ini
