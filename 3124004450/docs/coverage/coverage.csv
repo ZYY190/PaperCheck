@@ -1,0 +1,12 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+PaperCheck,com.zyy.papercheck,TextFileReader,47,208,4,18,4,33,4,12,0,5
+PaperCheck,com.zyy.papercheck,PaperCheckException,0,18,0,0,0,7,0,3,0,3
+PaperCheck,com.zyy.papercheck,SentenceSegmenter,1,155,2,24,1,37,2,15,0,4
+PaperCheck,com.zyy.papercheck,LcsMatcher,0,159,0,16,0,30,0,11,0,3
+PaperCheck,com.zyy.papercheck,NGramIndex.IntList,0,75,0,2,0,15,0,7,0,6
+PaperCheck,com.zyy.papercheck,NGramIndex,0,239,0,22,0,49,0,22,0,11
+PaperCheck,com.zyy.papercheck,SimilarityCalculator,35,635,16,80,9,141,15,41,0,8
+PaperCheck,com.zyy.papercheck,SimilarityCalculator.CandidateBag,0,39,0,2,0,8,0,4,0,3
+PaperCheck,com.zyy.papercheck,TextNormalizer,0,140,2,34,0,37,2,18,0,2
+PaperCheck,com.zyy.papercheck,TextFileWriter,29,60,3,9,4,11,3,5,0,2
+PaperCheck,com.zyy.papercheck,Main,27,76,3,3,7,15,3,3,1,2

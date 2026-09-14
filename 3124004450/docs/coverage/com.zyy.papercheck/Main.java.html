@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+import java.io.PrintStream;
+import java.util.Locale;
+
+/**
+ * 绋嬪簭鍏ュ彛銆�
+ *
+ * &lt;p&gt;鍛戒护琛屾牸寮忥紙涓変釜鍙傛暟鍧囦娇鐢ㄧ粷瀵硅矾寰勶紝璺緞涓笉鍏佽鍑虹幇绌烘牸锛夛細&lt;/p&gt;
+ * &lt;pre&gt;
+ * java -jar main.jar &amp;lt;鍘熸枃鏂囦欢&amp;gt; &amp;lt;鎶勮鐗堣鏂囨枃浠�&amp;gt; &amp;lt;绛旀鏂囦欢&amp;gt;
+ * &lt;/pre&gt;
+ *
+ * &lt;p&gt;閫�鍑虹爜绾﹀畾锛�0 鎴愬姛锛�2 鍙傛暟涓暟閿欒锛�3 鍙鏈熺殑涓氬姟閿欒锛�4 鏈鏈熺殑鍐呴儴閿欒銆�&lt;/p&gt;
+ *
+ * @author zyy
+ */
+<span class="fc" id="L18">public final class Main {</span>
+
+    /** 鍛戒护琛岀敤娉曟彁绀恒�� */
+    static final String USAGE =
+            &quot;鐢ㄦ硶: java -jar main.jar &lt;鍘熸枃鏂囦欢&gt; &lt;鎶勮鐗堣鏂囨枃浠�&gt; &lt;绛旀鏂囦欢&gt;&quot;;
+
+    /**
+     * @param args 鍛戒护琛屽弬鏁�
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L28">        int exitCode = new Main().run(args, System.out, System.err);</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (exitCode != 0) {</span>
+<span class="nc" id="L30">            System.exit(exitCode);</span>
+        }
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * 鎵ц涓�娆″畬鏁寸殑鏌ラ噸娴佺▼銆傛娊鍑鸿鏂规硶鏄负浜嗚鍗曞厓娴嬭瘯鍙互鐩存帴鏂█閫�鍑虹爜涓庤緭鍑猴紝
+     * 鑰屼笉蹇呭弽澶嶅惎鍔� JVM 瀛愯繘绋嬨��
+     *
+     * @param args 鍛戒护琛屽弬鏁�
+     * @param out  姝ｅ父杈撳嚭娴�
+     * @param err  閿欒杈撳嚭娴�
+     * @return 杩涚▼閫�鍑虹爜
+     */
+    public int run(String[] args, PrintStream out, PrintStream err) {
+<span class="pc bpc" id="L44" title="1 of 4 branches missed.">        if (args == null || args.length != 3) {</span>
+<span class="fc" id="L45">            err.println(&quot;[閿欒 &quot; + PaperCheckException.CODE_ARGUMENT_COUNT + &quot;] 鍙傛暟涓暟涓嶆纭紝闇�瑕� 3 涓枃浠惰矾寰勩��&quot;);</span>
+<span class="fc" id="L46">            err.println(USAGE);</span>
+<span class="fc" id="L47">            return 2;</span>
+        }
+        try {
+<span class="fc" id="L50">            String original = TextFileReader.read(args[0], &quot;鍘熸枃鏂囦欢&quot;);</span>
+<span class="fc" id="L51">            String copied = TextFileReader.read(args[1], &quot;鎶勮鐗堣鏂囨枃浠�&quot;);</span>
+<span class="fc" id="L52">            double rate = new SimilarityCalculator().calculate(original, copied);</span>
+<span class="fc" id="L53">            String answer = String.format(Locale.ROOT, &quot;%.2f&quot;, Double.valueOf(rate));</span>
+<span class="fc" id="L54">            TextFileWriter.write(args[2], answer);</span>
+<span class="fc" id="L55">            out.println(answer);</span>
+<span class="fc" id="L56">            return 0;</span>
+<span class="fc" id="L57">        } catch (PaperCheckException e) {</span>
+<span class="fc" id="L58">            err.println(&quot;[閿欒 &quot; + e.getCode() + &quot;] &quot; + e.getMessage());</span>
+<span class="fc" id="L59">            return 3;</span>
+<span class="nc" id="L60">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L61">            err.println(&quot;[閿欒 E500] 绋嬪簭鍐呴儴閿欒: &quot; + e.getMessage());</span>
+<span class="nc" id="L62">            return 4;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

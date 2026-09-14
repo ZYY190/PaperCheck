@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LcsMatcher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">LcsMatcher.java</span></div><h1>LcsMatcher.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+import java.util.Arrays;
+
+/**
+ * 鏈�闀垮叕鍏卞瓙搴忓垪锛圠ongest Common Subsequence锛夎绠楀櫒銆�
+ *
+ * &lt;p&gt;LCS 鐨勯暱搴︾洿鎺ュ洖绛斾簡銆屾妱琚増鐨勮繖涓�鍙ラ噷锛屾湁澶氬皯涓瓧鑳藉湪鍘熸枃涓寜鐩稿悓椤哄簭鎵惧埌銆嶏紝
+ * 鏄　閲忔钀界骇閲嶅绋嬪害鏈�鐩磋鐨勬寚鏍囥��&lt;/p&gt;
+ *
+ * &lt;p&gt;鏈被鍋氫簡涓ょ偣宸ョ▼浼樺寲锛�&lt;/p&gt;
+ * &lt;ol&gt;
+ *   &lt;li&gt;浣跨敤涓よ婊氬姩鏁扮粍锛屾妸绌洪棿澶嶆潅搴︿粠 O(n*m) 闄嶅埌 O(min(n,m))锛�
+ *       鍚屾椂閬垮厤浜嗘瘡娆℃瘮杈冮兘閲嶆柊鍒嗛厤鏁扮粍甯︽潵鐨� GC 鍘嬪姏锛�&lt;/li&gt;
+ *   &lt;li&gt;瀹炰緥鍙噸澶嶄娇鐢紝閰嶅悎璋冪敤鏂圭殑涓婄晫鍓灊锛屽ぇ骞呭噺灏戞棤鏁堣绠椼��&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * @author zyy
+ */
+public final class LcsMatcher {
+
+    /** 鍗曟姣旇緝鍏佽鐨勬渶澶ц妯★紙涓や釜搴忓垪闀垮害涔嬬Н锛夛紝瓒呰繃鏃惰皟鐢ㄦ柟搴旈��鍖栦负杩戜技绠楁硶銆� */
+    public static final long MAX_CELLS = 4000000L;
+
+    /** 涓婁竴琛岀粨鏋滐紱涓� {@link #current} 鍦ㄨ绠楄繃绋嬩腑浜ゆ浛浣跨敤銆� */
+    private int[] previous;
+
+    /** 褰撳墠琛岀粨鏋滐紱涓� {@link #previous} 鍦ㄨ绠楄繃绋嬩腑浜ゆ浛浣跨敤銆� */
+    private int[] current;
+
+    /**
+     * @param maxLength 鍏佽姣旇緝鐨勬渶闀垮簭鍒楅暱搴︼紝鍐冲畾婊氬姩鏁扮粍鐨勫ぇ灏�
+     */
+<span class="fc" id="L34">    public LcsMatcher(int maxLength) {</span>
+<span class="fc" id="L35">        int capacity = Math.max(maxLength, 1);</span>
+<span class="fc" id="L36">        this.previous = new int[capacity + 1];</span>
+<span class="fc" id="L37">        this.current = new int[capacity + 1];</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * 璁＄畻涓や釜搴忓垪鐨勬渶闀垮叕鍏卞瓙搴忓垪闀垮害銆�
+     *
+     * @param first  搴忓垪涓�
+     * @param second 搴忓垪浜�
+     * @return 鏈�闀垮叕鍏卞瓙搴忓垪鐨勯暱搴�
+     */
+    public int length(int[] first, int[] second) {
+<span class="fc bfc" id="L48" title="All 4 branches covered.">        if (first.length == 0 || second.length == 0) {</span>
+<span class="fc" id="L49">            return 0;</span>
+        }
+<span class="fc" id="L51">        int[] shorter = first;</span>
+<span class="fc" id="L52">        int[] longer = second;</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (shorter.length &gt; longer.length) {</span>
+<span class="fc" id="L54">            shorter = second;</span>
+<span class="fc" id="L55">            longer = first;</span>
+        }
+<span class="fc" id="L57">        ensureCapacity(longer.length);</span>
+        // 姣忔璋冪敤閮介噸缃紝淇濊瘉瀹炰緥鍙互琚噸澶嶄娇鐢�
+<span class="fc" id="L59">        Arrays.fill(previous, 0);</span>
+<span class="fc" id="L60">        Arrays.fill(current, 0);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (int i = 1; i &lt;= shorter.length; i++) {</span>
+<span class="fc" id="L62">            int codePoint = shorter[i - 1];</span>
+<span class="fc" id="L63">            current[0] = 0;</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            for (int j = 1; j &lt;= longer.length; j++) {</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">                if (codePoint == longer[j - 1]) {</span>
+<span class="fc" id="L66">                    current[j] = previous[j - 1] + 1;</span>
+                } else {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">                    current[j] = previous[j] &gt;= current[j - 1] ? previous[j] : current[j - 1];</span>
+                }
+            }
+            // 浜ゆ崲涓よ锛歝urrent 鐨勬瘡涓�鏍煎湪涓嬩竴杞兘浼氳閲嶆柊鍐欏叆锛屾棤闇�娓呴浂
+<span class="fc" id="L72">            int[] swap = previous;</span>
+<span class="fc" id="L73">            previous = current;</span>
+<span class="fc" id="L74">            current = swap;</span>
+        }
+<span class="fc" id="L76">        return previous[longer.length];</span>
+    }
+
+    /**
+     * 闃插尽寮忔墿瀹癸細鍗充娇璋冪敤鏂逛及绠楃殑闀垮害鍋忓皬锛屼篃涓嶄細鎶涘嚭鏁扮粍瓒婄晫寮傚父銆�
+     *
+     * @param requiredLength 鏈姣旇緝鎵�闇�鐨勬渶澶ч暱搴�
+     */
+    private void ensureCapacity(int requiredLength) {
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (previous.length &lt;= requiredLength) {</span>
+<span class="fc" id="L86">            previous = new int[requiredLength + 1];</span>
+<span class="fc" id="L87">            current = new int[requiredLength + 1];</span>
+        }
+<span class="fc" id="L89">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

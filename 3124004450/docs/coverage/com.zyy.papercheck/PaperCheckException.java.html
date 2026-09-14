@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaperCheckException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">PaperCheckException.java</span></div><h1>PaperCheckException.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+/**
+ * 椤圭洰鑷畾涔夌殑妫�鏌ュ紓甯搞��
+ *
+ * &lt;p&gt;绋嬪簭涓墍鏈夈�屽彲浠ラ鏈熴�嶇殑閿欒锛堝弬鏁颁釜鏁颁笉瀵广�佹枃浠朵笉瀛樺湪銆佺紪鐮佹棤娉曡瘑鍒�佹枃浠惰秴杩囧閲忎笂闄愮瓑锛�
+ * 閮介�氳繃璇ュ紓甯稿悜涓婃姏鍑猴紝鏈�缁堢敱 {@link Main} 缁熶竴缈昏瘧鎴愮敤鎴峰彲璇荤殑閿欒鎻愮ず鍜岃繘绋嬮��鍑虹爜锛�
+ * 閬垮厤鎶� Java 鍫嗘爤鐩存帴鏆撮湶缁欒瘎娴嬬▼搴忋��&lt;/p&gt;
+ *
+ * @author zyy
+ */
+public class PaperCheckException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
+    /** 鍛戒护琛屽弬鏁颁釜鏁颁笉姝ｇ‘銆� */
+    public static final String CODE_ARGUMENT_COUNT = &quot;E001&quot;;
+    /** 杈撳叆鏂囦欢涓嶅瓨鍦ㄣ�� */
+    public static final String CODE_FILE_NOT_FOUND = &quot;E002&quot;;
+    /** 璺緞鎸囧悜鐨勪笉鏄櫘閫氭枃浠躲�� */
+    public static final String CODE_NOT_A_FILE = &quot;E003&quot;;
+    /** 鏂囦欢璇诲啓澶辫触锛堟潈闄愪笉瓒炽�佽鍏跺畠杩涚▼鍗犵敤绛夛級銆� */
+    public static final String CODE_IO_ERROR = &quot;E004&quot;;
+    /** 鏂囦欢缂栫爜鏃犳硶璇嗗埆銆� */
+    public static final String CODE_ENCODING = &quot;E005&quot;;
+    /** 鏂囦欢浣撶Н瓒呰繃绋嬪簭鍏佽鐨勪笂闄愩�� */
+    public static final String CODE_FILE_TOO_LARGE = &quot;E006&quot;;
+    /** 绛旀鏂囦欢璺緞闈炴硶鎴栦笉鍙啓銆� */
+    public static final String CODE_OUTPUT_INVALID = &quot;E007&quot;;
+
+    /** 閿欒鐮侊紝渚夸簬鍗曞厓娴嬭瘯绮剧‘鏂█銆� */
+    private final String code;
+
+    /**
+     * @param code    閿欒鐮侊紝鍙栧�艰鏈被涓殑 CODE_* 甯搁噺
+     * @param message 闈㈠悜浣跨敤鑰呯殑閿欒鎻忚堪
+     */
+    public PaperCheckException(String code, String message) {
+<span class="fc" id="L39">        super(message);</span>
+<span class="fc" id="L40">        this.code = code;</span>
+<span class="fc" id="L41">    }</span>
+
+    /**
+     * @param code    閿欒鐮�
+     * @param message 闈㈠悜浣跨敤鑰呯殑閿欒鎻忚堪
+     * @param cause   搴曞眰鍘熷洜锛屼繚鐣欏爢鏍堜究浜庢帓鏌�
+     */
+    public PaperCheckException(String code, String message, Throwable cause) {
+<span class="fc" id="L49">        super(message, cause);</span>
+<span class="fc" id="L50">        this.code = code;</span>
+<span class="fc" id="L51">    }</span>
+
+    /**
+     * @return 閿欒鐮�
+     */
+    public String getCode() {
+<span class="fc" id="L57">        return code;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

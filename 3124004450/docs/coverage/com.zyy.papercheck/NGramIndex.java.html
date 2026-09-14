@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NGramIndex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">NGramIndex.java</span></div><h1>NGramIndex.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+/**
+ * 浜屽厓瀛楃粍锛坆igram锛夊�掓帓绱㈠紩銆�
+ *
+ * &lt;p&gt;绱㈠紩鎶娿�岃繛缁殑浠绘剰涓や釜瀛椼�嶆槧灏勫埌銆屽嚭鐜拌繃瀹冪殑鍙ュ瓙缂栧彿銆嶃��
+ * 鍖归厤闃舵鍏堢敤瀹冨揩閫熺瓫鍑哄彲鑳介噸澶嶇殑鍊欓�夊彞锛屽啀瀵瑰�欓�夊彞鍋氱簿纭殑搴忓垪姣斿锛�
+ * 浠庤�岄伩鍏嶄换鎰忎袱鍙ラ兘涓や袱姣旇緝銆�&lt;/p&gt;
+ *
+ * &lt;p&gt;绱㈠紩涓�鏃﹀缓绔嬩究涓嶅啀淇敼锛屽洜姝や笉鏄嚎绋嬪畨鍏ㄧ殑锛屼絾鍙互鎸夊彧璇绘柟寮忚澶氭鏌ヨ銆�&lt;/p&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;鎬ц兘璁捐&lt;/b&gt;锛氶敭鏄袱涓瓧缁勫悎鑰屾垚鐨� 64 浣嶆暣鏁帮紝鑻ョ洿鎺ヤ娇鐢�
+ * {@code HashMap&lt;Long, ?&gt;} 浼氬湪姣忔鏌ヨ鏃朵骇鐢熻绠卞璞°�傝繖閲屾敼鐢ㄥ紑鏀惧湴鍧�娉曠殑
+ * 鍘熷绫诲瀷鍝堝笇琛紝鏌ヨ杩囩▼闆跺璞″垎閰嶏紝鍦ㄥぇ鏂囦欢涓嬪彲浠ュ噺灏戝ぇ閲� GC 鍘嬪姏銆�&lt;/p&gt;
+ *
+ * @author zyy
+ */
+<span class="fc" id="L18">public final class NGramIndex {</span>
+
+    /** 瀛楃粍鐨勯暱搴︼紝鍙� 2锛堜簩鍏冪粍锛夊湪涓枃鏂囨湰涓婂吋椤惧尯鍒嗗害涓庣储寮曚綋绉�� */
+    static final int GRAM_SIZE = 2;
+
+    /** 鍒濆妗舵暟閲忥紝鍙� 2 鐨勫箓渚夸簬鐢ㄤ綅杩愮畻鍙栨ā銆� */
+    private static final int INITIAL_CAPACITY = 1 &lt;&lt; 12;
+
+    /** 閿暟缁勶紱0 琛ㄧず绌烘Ы浣嶏紙鐮佺偣鎭掑ぇ浜� 0锛屽洜姝ら敭涓嶄細涓� 0锛夈�� */
+<span class="fc" id="L27">    private long[] keys = new long[INITIAL_CAPACITY];</span>
+
+    /** 涓� {@link #keys} 涓�涓�瀵瑰簲鐨勫彞瀛愮紪鍙峰垪琛ㄣ�� */
+<span class="fc" id="L30">    private IntList[] values = new IntList[INITIAL_CAPACITY];</span>
+
+    /** 鎺╃爜锛岀瓑浜庛�屾《鏁伴噺 - 1銆嶃�� */
+<span class="fc" id="L33">    private int mask = INITIAL_CAPACITY - 1;</span>
+
+    /** 宸蹭娇鐢ㄧ殑妗舵暟閲忋�� */
+    private int used;
+
+    /**
+     * 鎶婁竴涓彞瀛愮櫥璁板埌绱㈠紩涓��
+     *
+     * @param sentenceId 鍙ュ瓙缂栧彿
+     * @param codePoints 璇ュ彞鐨勭壒寰佺爜鐐�
+     */
+    public void add(int sentenceId, int[] codePoints) {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        for (int i = 0; i + GRAM_SIZE &lt;= codePoints.length; i++) {</span>
+<span class="fc" id="L46">            long key = key(codePoints[i], codePoints[i + 1]);</span>
+<span class="fc" id="L47">            IntList list = findByKey(key);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            if (list == null) {</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">                if ((used + 1) * 2 &gt; keys.length) {</span>
+<span class="fc" id="L50">                    grow();</span>
+                }
+<span class="fc" id="L52">                list = new IntList(2);</span>
+<span class="fc" id="L53">                insert(key, list);</span>
+            }
+            // 鍚屼竴涓彞瀛愬唴閲嶅鍑虹幇鐨勫瓧缁勫彧鐧昏涓�娆★紝淇濊瘉 df 鐨勫惈涔夋槸銆屽彞瀛愭暟銆�
+<span class="fc bfc" id="L56" title="All 4 branches covered.">            if (list.size() == 0 || list.last() != sentenceId) {</span>
+<span class="fc" id="L57">                list.add(sentenceId);</span>
+            }
+        }
+<span class="fc" id="L60">    }</span>
+
+    /**
+     * 鏌ヨ鏌愪釜瀛楃粍鍑虹幇杩囩殑鎵�鏈夊彞瀛愮紪鍙枫��
+     *
+     * @param first  鍓嶄竴涓瓧
+     * @param second 鍚庝竴涓瓧
+     * @return 鍙ュ瓙缂栧彿鏁扮粍锛涙病鏈夊懡涓椂杩斿洖闀垮害涓� 0 鐨勬暟缁勶紝涓嶄細杩斿洖 {@code null}
+     */
+    public int[] lookup(int first, int second) {
+<span class="fc" id="L70">        IntList list = findByKey(key(first, second));</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        return list == null ? EMPTY : list.toArray();</span>
+    }
+
+    /**
+     * @return 绱㈠紩涓笉鍚屽瓧缁勭殑涓暟锛岀敤浜庢�ц兘缁熻涓庡崟鍏冩祴璇�
+     */
+    public int gramCount() {
+<span class="fc" id="L78">        return used;</span>
+    }
+
+    /**
+     * 鎶婁袱涓瓧鍚堟垚涓�涓� 64 浣嶉敭銆傛眽瀛楃爜鐐逛笉瓒呰繃 21 浣嶏紝鍥犳涓嶄細浜х敓閿啿绐併��
+     */
+    private static long key(int first, int second) {
+<span class="fc" id="L85">        return ((long) first &lt;&lt; 21) | (second &amp; 0x1FFFFFL);</span>
+    }
+
+    /**
+     * 鍦ㄥ搱甯岃〃涓煡鎵鹃敭瀵瑰簲鐨勫垪琛ㄣ�傜儹璺緞涓撶敤鐨勫寘鍐呮柟娉曪紝閬垮厤杩斿洖鏁扮粍鍓湰銆�
+     *
+     * @param first  鍓嶄竴涓瓧
+     * @param second 鍚庝竴涓瓧
+     * @return 鍙ュ瓙缂栧彿鍒楄〃锛涙湭鍛戒腑杩斿洖 {@code null}
+     */
+    IntList postingsOf(int first, int second) {
+<span class="fc" id="L96">        return findByKey(key(first, second));</span>
+    }
+
+    /**
+     * 寮�鏀惧湴鍧�娉曟煡鎵俱��
+     *
+     * @param key 浜屽厓缁勯敭
+     * @return 瀵瑰簲鐨勫垪琛紝鏈懡涓繑鍥� {@code null}
+     */
+    private IntList findByKey(long key) {
+<span class="fc" id="L106">        int slot = spread(key) &amp; mask;</span>
+        while (true) {
+<span class="fc" id="L108">            long current = keys[slot];</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            if (current == 0L) {</span>
+<span class="fc" id="L110">                return null;</span>
+            }
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (current == key) {</span>
+<span class="fc" id="L113">                return values[slot];</span>
+            }
+<span class="fc" id="L115">            slot = (slot + 1) &amp; mask;</span>
+<span class="fc" id="L116">        }</span>
+    }
+
+    /**
+     * 鎶婇敭鍊煎鍐欏叆鍝堝笇琛紙璋冪敤鏂归渶鍏堜繚璇佸瓨鍦ㄧ┖妲斤級銆�
+     *
+     * @param key   浜屽厓缁勯敭
+     * @param value 鍙ュ瓙缂栧彿鍒楄〃
+     */
+    private void insert(long key, IntList value) {
+<span class="fc" id="L126">        int slot = spread(key) &amp; mask;</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        while (keys[slot] != 0L) {</span>
+<span class="fc" id="L128">            slot = (slot + 1) &amp; mask;</span>
+        }
+<span class="fc" id="L130">        keys[slot] = key;</span>
+<span class="fc" id="L131">        values[slot] = value;</span>
+<span class="fc" id="L132">        used++;</span>
+<span class="fc" id="L133">    }</span>
+
+    /**
+     * 鎵╁骞舵妸鎵�鏈夊厓绱犻噸鏂版暎鍒椼�傚閲忕炕鍊嶏紝淇濊瘉璐熻浇鍥犲瓙涓嶈秴杩� 50%銆�
+     */
+    private void grow() {
+<span class="fc" id="L139">        long[] oldKeys = keys;</span>
+<span class="fc" id="L140">        IntList[] oldValues = values;</span>
+<span class="fc" id="L141">        int newCapacity = oldKeys.length &lt;&lt; 1;</span>
+<span class="fc" id="L142">        keys = new long[newCapacity];</span>
+<span class="fc" id="L143">        values = new IntList[newCapacity];</span>
+<span class="fc" id="L144">        mask = newCapacity - 1;</span>
+<span class="fc" id="L145">        used = 0;</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        for (int i = 0; i &lt; oldKeys.length; i++) {</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">            if (oldKeys[i] != 0L) {</span>
+<span class="fc" id="L148">                insert(oldKeys[i], oldValues[i]);</span>
+            }
+        }
+<span class="fc" id="L151">    }</span>
+
+    /**
+     * 鎶� 64 浣嶉敭娣峰悎鎴愭《涓嬫爣鐨勯珮浣嶉儴鍒嗭紝鍑忓皯杩炵画閿�犳垚鐨勮仛闆嗐��
+     *
+     * @param key 浜屽厓缁勯敭
+     * @return 娣峰悎鍚庣殑鍝堝笇鍊�
+     */
+    private static int spread(long key) {
+<span class="fc" id="L160">        long mixed = key * 0x9E3779B97F4A7C15L;</span>
+<span class="fc" id="L161">        return (int) (mixed &gt;&gt;&gt; 33);</span>
+    }
+
+    /** 绌虹粨鏋滃父閲忥紝閬垮厤姣忔鏌ヨ閮芥柊寤烘暟缁勩�� */
+<span class="fc" id="L165">    private static final int[] EMPTY = new int[0];</span>
+
+    /**
+     * 鏋佺畝鐨勫彲澧為暱 int 鍒楄〃锛屾浛浠� {@code List&lt;Integer&gt;} 浠ュ噺灏戣绠变笌鍐呭瓨寮�閿�銆�
+     */
+    static final class IntList {
+
+        private int[] data;
+        private int size;
+
+<span class="fc" id="L175">        IntList(int initialCapacity) {</span>
+<span class="fc" id="L176">            this.data = new int[Math.max(initialCapacity, 2)];</span>
+<span class="fc" id="L177">        }</span>
+
+        void add(int value) {
+<span class="fc bfc" id="L180" title="All 2 branches covered.">            if (size == data.length) {</span>
+<span class="fc" id="L181">                int[] grown = new int[data.length * 2];</span>
+<span class="fc" id="L182">                System.arraycopy(data, 0, grown, 0, size);</span>
+<span class="fc" id="L183">                data = grown;</span>
+            }
+<span class="fc" id="L185">            data[size++] = value;</span>
+<span class="fc" id="L186">        }</span>
+
+        int size() {
+<span class="fc" id="L189">            return size;</span>
+        }
+
+        int last() {
+<span class="fc" id="L193">            return data[size - 1];</span>
+        }
+
+        int get(int index) {
+<span class="fc" id="L197">            return data[index];</span>
+        }
+
+        int[] toArray() {
+<span class="fc" id="L201">            int[] copy = new int[size];</span>
+<span class="fc" id="L202">            System.arraycopy(data, 0, copy, 0, size);</span>
+<span class="fc" id="L203">            return copy;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

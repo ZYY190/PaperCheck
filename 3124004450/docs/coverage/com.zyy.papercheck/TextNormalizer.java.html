@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TextNormalizer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">TextNormalizer.java</span></div><h1>TextNormalizer.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+import java.util.Arrays;
+
+/**
+ * 鏂囨湰瑙勮寖鍖栧伐鍏枫��
+ *
+ * &lt;p&gt;鏌ラ噸绠楁硶瀵广�屽悓涓�涓瓧鐨勪笉鍚屽啓娉曘�嶅簲褰撲竴瑙嗗悓浠侊紝鍥犳鍦ㄨ繘鍏ョ畻娉曟牳蹇冧箣鍓嶏紝
+ * 鍏堟妸鍘熷鏂囨湰缁熶竴鎴愭爣鍑嗗舰寮忥紝娑堥櫎涓庡唴瀹规棤鍏崇殑宸紓銆�&lt;/p&gt;
+ *
+ * &lt;p&gt;绫昏璁′负涓嶅彲鍙樸�佹棤鐘舵�侊紝鎵�鏈夋柟娉曢兘鏄潤鎬佺殑锛屼究浜庡崟鍏冩祴璇曘��&lt;/p&gt;
+ *
+ * @author zyy
+ */
+public final class TextNormalizer {
+
+    /** 鍏ㄨ ASCII 鍖洪棿璧风偣锛堬紒锛夈�� */
+    private static final int FULL_WIDTH_START = 0xFF01;
+    /** 鍏ㄨ ASCII 鍖洪棿缁堢偣锛堬綖锛夈�� */
+    private static final int FULL_WIDTH_END = 0xFF5E;
+    /** 鍏ㄨ涓庡崐瑙掍箣闂寸殑鍥哄畾鍋忕Щ閲忋�� */
+    private static final int FULL_WIDTH_OFFSET = 0xFEE0;
+    /** 鍏ㄨ绌烘牸銆� */
+    private static final int IDEOGRAPHIC_SPACE = 0x3000;
+
+    private TextNormalizer() {
+    }
+
+    /**
+     * 鎶婂師濮嬫枃鏈粺涓�鎴愭爣鍑嗘枃鏈紝瑙勫垯濡備笅锛�
+     * &lt;ol&gt;
+     *   &lt;li&gt;鍘绘帀 UTF-8 BOM 涓庡叾瀹冧笉鍙鎺у埗瀛楃锛�&lt;/li&gt;
+     *   &lt;li&gt;鍏ㄨ瀛楃锛堝惈鍏ㄨ绌烘牸锛夎浆鍗婅锛�&lt;/li&gt;
+     *   &lt;li&gt;鑻辨枃澶у啓杞皬鍐欙紱&lt;/li&gt;
+     *   &lt;li&gt;缁熶竴鎹㈣绗︿负 {@code '\n'}銆�&lt;/li&gt;
+     * &lt;/ol&gt;
+     * 鏍囩偣绗﹀彿浼氳淇濈暀锛屽洜涓哄悗缁垎鍙ヤ緷璧栧畠浠��
+     *
+     * @param raw 鍘熷鏂囨湰锛屽厑璁镐负 {@code null}
+     * @return 瑙勮寖鍖栧悗鐨勬枃鏈紝涓嶄細杩斿洖 {@code null}
+     */
+    public static String normalize(String raw) {
+<span class="fc bfc" id="L43" title="All 4 branches covered.">        if (raw == null || raw.isEmpty()) {</span>
+<span class="fc" id="L44">            return &quot;&quot;;</span>
+        }
+<span class="fc" id="L46">        StringBuilder builder = new StringBuilder(raw.length());</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        for (int i = 0; i &lt; raw.length(); ) {</span>
+<span class="fc" id="L48">            int codePoint = raw.codePointAt(i);</span>
+<span class="fc" id="L49">            i += Character.charCount(codePoint);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">            if (codePoint == '\uFEFF') {</span>
+<span class="fc" id="L51">                continue;</span>
+            }
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (codePoint == '\r') {</span>
+                // Windows 鐨� \r\n 鍙涓轰竴娆℃崲琛�
+<span class="pc bpc" id="L55" title="1 of 4 branches missed.">                if (i &lt; raw.length() &amp;&amp; raw.charAt(i) == '\n') {</span>
+<span class="fc" id="L56">                    i++;</span>
+                }
+<span class="fc" id="L58">                builder.append('\n');</span>
+<span class="fc" id="L59">                continue;</span>
+            }
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            if (codePoint == '\t') {</span>
+<span class="fc" id="L62">                builder.append(' ');</span>
+<span class="fc" id="L63">                continue;</span>
+            }
+<span class="fc bfc" id="L65" title="All 4 branches covered.">            if (codePoint &lt; 0x20 &amp;&amp; codePoint != '\n') {</span>
+<span class="fc" id="L66">                continue;</span>
+            }
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            if (codePoint == IDEOGRAPHIC_SPACE) {</span>
+<span class="fc" id="L69">                builder.append(' ');</span>
+<span class="fc" id="L70">                continue;</span>
+            }
+<span class="pc bpc" id="L72" title="1 of 4 branches missed.">            if (codePoint &gt;= FULL_WIDTH_START &amp;&amp; codePoint &lt;= FULL_WIDTH_END) {</span>
+<span class="fc" id="L73">                codePoint -= FULL_WIDTH_OFFSET;</span>
+            }
+<span class="fc" id="L75">            builder.appendCodePoint(Character.toLowerCase(codePoint));</span>
+<span class="fc" id="L76">        }</span>
+<span class="fc" id="L77">        return builder.toString();</span>
+    }
+
+    /**
+     * 鎻愬彇銆岀壒寰佺爜鐐广�嶏細鍙繚鐣欐眽瀛椼�佸瓧姣嶄笌鏁板瓧锛屼涪寮冪┖鐧姐�佹爣鐐逛笌鍚勭被绗﹀彿銆�
+     *
+     * &lt;p&gt;浣跨敤鐮佺偣鑰屼笉鏄� {@code char}锛屽彲浠ユ纭鐞嗗琛ュ钩闈笂鐨勬眽瀛楋紙濡� emoji 涔嬪悗鐨勭敓鍍诲瓧锛夛紝
+     * 涓嶄細鎶婁竴涓瓧绗︽媶鎴愪袱涓棤鎰忎箟鐨勪唬鐞嗛」銆�&lt;/p&gt;
+     *
+     * @param normalizedText 宸茬粡杩� {@link #normalize(String)} 澶勭悊鐨勬枃鏈�
+     * @return 鐗瑰緛鐮佺偣鏁扮粍锛屽彲鑳戒负绌烘暟缁�
+     */
+    public static int[] toFeatureCodePoints(String normalizedText) {
+<span class="fc bfc" id="L90" title="All 4 branches covered.">        if (normalizedText == null || normalizedText.isEmpty()) {</span>
+<span class="fc" id="L91">            return new int[0];</span>
+        }
+        // 鐩存帴鍐欏叆 int 鏁扮粍锛岄伩鍏� List&lt;Integer&gt; 鐨勮绠卞紑閿�锛堝ぇ鏂囦欢涓嬭繖涓�椤归潪甯稿彲瑙傦級
+<span class="fc" id="L94">        int[] buffer = new int[normalizedText.length()];</span>
+<span class="fc" id="L95">        int size = 0;</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        for (int i = 0; i &lt; normalizedText.length(); ) {</span>
+<span class="fc" id="L97">            int codePoint = normalizedText.codePointAt(i);</span>
+<span class="fc" id="L98">            i += Character.charCount(codePoint);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            if (Character.isLetterOrDigit(codePoint)) {</span>
+<span class="fc" id="L100">                buffer[size++] = codePoint;</span>
+            }
+<span class="fc" id="L102">        }</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        return size == buffer.length ? buffer : Arrays.copyOf(buffer, size);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

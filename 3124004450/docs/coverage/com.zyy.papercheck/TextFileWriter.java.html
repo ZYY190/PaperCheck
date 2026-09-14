@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TextFileWriter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">TextFileWriter.java</span></div><h1>TextFileWriter.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+
+/**
+ * 绛旀鏂囦欢鍐欏嚭鍣細璐熻矗杈撳嚭璺緞鏍￠獙涓庣洰褰曞厹搴曞垱寤恒��
+ *
+ * @author zyy
+ */
+public final class TextFileWriter {
+
+<span class="fc" id="L15">    private static final Charset UTF_8 = Charset.forName(&quot;UTF-8&quot;);</span>
+
+    private TextFileWriter() {
+    }
+
+    /**
+     * 鎶婄粨鏋滃啓鍏ョ瓟妗堟枃浠躲�傝嫢鐖剁洰褰曚笉瀛樺湪浼氳嚜鍔ㄥ垱寤猴紝灏介噺閬垮厤鍥犱负鐜宸紓鑰岃瘎娴嬪け璐ャ��
+     *
+     * @param path    绛旀鏂囦欢缁濆璺緞
+     * @param content 寰呭啓鍏ュ唴瀹�
+     * @throws PaperCheckException 璺緞闈炴硶鎴栧啓鍏ュけ璐ユ椂鎶涘嚭
+     */
+    public static void write(String path, String content) throws PaperCheckException {
+<span class="pc bpc" id="L28" title="1 of 4 branches missed.">        if (path == null || path.trim().isEmpty()) {</span>
+<span class="fc" id="L29">            throw new PaperCheckException(PaperCheckException.CODE_OUTPUT_INVALID, &quot;绛旀鏂囦欢璺緞涓虹┖銆�&quot;);</span>
+        }
+<span class="fc" id="L31">        File file = new File(path);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (file.isDirectory()) {</span>
+<span class="fc" id="L33">            throw new PaperCheckException(PaperCheckException.CODE_OUTPUT_INVALID,</span>
+                    &quot;绛旀鏂囦欢璺緞鏄竴涓洰褰�: &quot; + path);
+        }
+<span class="fc" id="L36">        File parent = file.getAbsoluteFile().getParentFile();</span>
+<span class="pc bpc" id="L37" title="2 of 6 branches missed.">        if (parent != null &amp;&amp; !parent.exists() &amp;&amp; !parent.mkdirs()) {</span>
+<span class="nc" id="L38">            throw new PaperCheckException(PaperCheckException.CODE_OUTPUT_INVALID,</span>
+<span class="nc" id="L39">                    &quot;绛旀鏂囦欢鎵�鍦ㄧ洰褰曚笉瀛樺湪涓斿垱寤哄け璐�: &quot; + parent.getPath());</span>
+        }
+        try {
+<span class="fc" id="L42">            Files.write(file.toPath(), content.getBytes(UTF_8));</span>
+<span class="nc" id="L43">        } catch (IOException e) {</span>
+<span class="nc" id="L44">            throw new PaperCheckException(PaperCheckException.CODE_IO_ERROR,</span>
+                    &quot;绛旀鏂囦欢鍐欏叆澶辫触锛堝彲鑳借鍗犵敤鎴栨病鏈夊啓鏉冮檺锛�: &quot; + path, e);
+<span class="fc" id="L46">        }</span>
+<span class="fc" id="L47">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

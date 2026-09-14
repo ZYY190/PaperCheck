@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimilarityCalculator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">PaperCheck</a> &gt; <a href="index.source.html" class="el_package">com.zyy.papercheck</a> &gt; <span class="el_source">SimilarityCalculator.java</span></div><h1>SimilarityCalculator.java</h1><pre class="source lang-java linenums">package com.zyy.papercheck;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * 璁＄畻妯″潡鏍稿績锛氶噸澶嶇巼璁＄畻鍣ㄣ��
+ *
+ * &lt;p&gt;&lt;b&gt;绠楁硶鎬濇兂&lt;/b&gt;锛氭妸銆岄噸澶嶇巼銆嶅畾涔変负銆屾妱琚増涓湁澶氬皯姣斾緥鐨勫唴瀹癸紝鍙互鍦ㄥ師鏂囬噷鎵惧埌椤哄簭涓�鑷寸殑瀵瑰簲銆嶃��
+ * 璇ュ畾涔夊ぉ鐒舵槸鍗曞悜鐨勨�斺�旀妱琚増閲屾柊鍐欑殑鍐呭涓嶇畻閲嶅锛屾妱鏉ョ殑鍐呭鎵嶇畻閲嶅锛屼笌鏌ラ噸涓氬姟璇箟涓�鑷淬��&lt;/p&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;璁＄畻姝ラ&lt;/b&gt;锛�&lt;/p&gt;
+ * &lt;ol&gt;
+ *   &lt;li&gt;瑙勮寖鍖栵細娑堥櫎鍏ㄨ/鍗婅銆佸ぇ灏忓啓銆佷笉鍙瀛楃绛夋棤鍏冲樊寮傦紱&lt;/li&gt;
+ *   &lt;li&gt;鍒嗗彞锛氭妸鏂囩珷鍒囨垚鍙ュ瓙锛屼娇鍗曟姣斿鐨勮妯℃湁涓婄晫锛�&lt;/li&gt;
+ *   &lt;li&gt;寤虹珛鍘熸枃鐨勪簩鍏冨瓧缁勫�掓帓绱㈠紩锛�&lt;/li&gt;
+ *   &lt;li&gt;瀵规妱琚増鐨勬瘡涓�鍙ワ紝鐢ㄥ�掓帓绱㈠紩绛涘嚭鍊欓�夊彞锛屽啀鐢� LCS 姹傛渶澶у叕鍏卞瓙搴忓垪闀垮害锛�&lt;/li&gt;
+ *   &lt;li&gt;閲嶅鐜� = 鍚勫彞鏈�澶у叕鍏卞瓙搴忓垪闀垮害涔嬪拰 / 鎶勮鐗堢壒寰佸瓧绗︽�绘暟銆�&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;鎬ц兘璁捐&lt;/b&gt;锛氬�欓�夌瓫閫変笌鍛戒腑璁℃暟鍏ㄩ儴浣跨敤鍘熷绫诲瀷鏁扮粍锛岄厤鍚堛�屾椂闂存埑鏁扮粍銆�
+ * 浠ｆ浛姣忔娓呴浂锛岄伩鍏嶅湪澶ф枃浠朵笂浜х敓娴烽噺涓存椂瀵硅薄锛涘瀹屽叏鐩稿悓鐨勫彞瀛愮洿鎺ョ煭璺繑鍥烇紝
+ * 涓嶅啀鍋� LCS銆傝繖浜涙帾鏂戒娇鐧句竾瀛楃绾у埆鐨勬枃妗ｄ篃鑳藉湪涓�绉掗噺绾у畬鎴愩��&lt;/p&gt;
+ *
+ * &lt;p&gt;鏈被鏃犵姸鎬侊紝鍙畨鍏ㄥ湴鍦ㄥ绾跨▼涓叡浜娇鐢ㄣ��&lt;/p&gt;
+ *
+ * @author zyy
+ */
+<span class="fc" id="L31">public final class SimilarityCalculator {</span>
+
+    /** 姣忎釜鍙ュ瓙鏈�澶氫繚鐣欑殑鍊欓�夊彞鏁伴噺锛岄槻姝㈢儹闂ㄥ彞瀛愭嫋鎱㈡暣浣撻�熷害銆� */
+    static final int MAX_CANDIDATES = 512;
+
+    /** 姣忎釜鍙ュ瓙鏈�澶氬仛澶氬皯娆� LCS 绮剧‘姣斿锛屼繚璇佸崟鍙ュ紑閿�鏈夌‖涓婄晫銆� */
+    static final int MAX_LCS_PER_SENTENCE = 24;
+
+    /** 鍙ュ瓙闀垮害鐩稿樊瓒呰繃璇ュ�嶆暟鏃剁洿鎺ュ垽瀹氫负涓嶅彲鑳介珮搴﹂噸澶嶃�� */
+    static final int LENGTH_RATIO = 6;
+
+    /** 楂橀瀛楃粍鐨勮瘝棰戜笂闄愪笅闄愶細鍑虹幇鍦ㄨ秴杩囪鏁伴噺鍙ュ瓙閲岀殑瀛楃粍涓嶅弬涓庡�欓�夌瓫閫夈�� */
+    static final int POSTINGS_DF_MIN = 64;
+
+    /** 鍗曚釜鍙ュ瓙鎵弿鍊掓帓琛ㄧ殑鏈�澶ф潯鐩暟锛屼繚璇佸崟鍙ュ紑閿�鏈夌‖涓婄晫銆� */
+    static final int MAX_POSTINGS_VISITS = 4000;
+
+    /**
+     * 璁＄畻涓ょ瘒鏂囩珷鐨勯噸澶嶇巼銆�
+     *
+     * @param originalText 鍘熸枃鍐呭
+     * @param copiedText   鎶勮鐗堣鏂囧唴瀹�
+     * @return 鍙栧�艰寖鍥� [0, 1] 鐨勯噸澶嶇巼锛涗换鎰忎竴鏂规病鏈夋湁鏁堝唴瀹规椂杩斿洖 0
+     */
+    public double calculate(String originalText, String copiedText) {
+<span class="pc bpc" id="L56" title="2 of 4 branches missed.">        if (originalText == null || copiedText == null) {</span>
+<span class="nc" id="L57">            return 0.0;</span>
+        }
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (originalText.equals(copiedText)) {</span>
+            // 蹇�熻矾寰勶細瀹屽叏鐩稿悓鐨勬枃浠舵棤闇�鍒嗗彞姣斿锛�
+            // 浣嗙函绌虹櫧/绾爣鐐圭殑銆岀浉鍚屻�嶅苟娌℃湁浠讳綍鏈夋晥鍐呭锛屼粛鐒跺簲褰撹繑鍥� 0
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            boolean hasFeature = TextNormalizer.toFeatureCodePoints(</span>
+<span class="fc" id="L63">                    TextNormalizer.normalize(originalText)).length &gt; 0;</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            return hasFeature ? 1.0 : 0.0;</span>
+        }
+<span class="fc" id="L66">        List&lt;int[]&gt; originalSentences = SentenceSegmenter.segment(TextNormalizer.normalize(originalText));</span>
+<span class="fc" id="L67">        List&lt;int[]&gt; copiedSentences = SentenceSegmenter.segment(TextNormalizer.normalize(copiedText));</span>
+<span class="fc bfc" id="L68" title="All 4 branches covered.">        if (originalSentences.isEmpty() || copiedSentences.isEmpty()) {</span>
+<span class="fc" id="L69">            return 0.0;</span>
+        }
+<span class="fc" id="L71">        int copiedLength = countCodePoints(copiedSentences);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (copiedLength == 0) {</span>
+<span class="nc" id="L73">            return 0.0;</span>
+        }
+<span class="fc" id="L75">        int matched = matchSentences(originalSentences, copiedSentences);</span>
+<span class="fc" id="L76">        double rate = (double) matched / copiedLength;</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (rate &lt; 0.0) {</span>
+<span class="nc" id="L78">            return 0.0;</span>
+        }
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        return rate &gt; 1.0 ? 1.0 : rate;</span>
+    }
+
+    /**
+     * 缁熻鍙ュ瓙鍒楄〃涓殑鐗瑰緛瀛楃鎬绘暟銆�
+     *
+     * @param sentences 鍙ュ瓙鍒楄〃
+     * @return 鐗瑰緛瀛楃鎬绘暟
+     */
+    private static int countCodePoints(List&lt;int[]&gt; sentences) {
+<span class="fc" id="L90">        int total = 0;</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (int i = 0; i &lt; sentences.size(); i++) {</span>
+<span class="fc" id="L92">            total += sentences.get(i).length;</span>
+        }
+<span class="fc" id="L94">        return total;</span>
+    }
+
+    /**
+     * 閫愬彞鍖归厤锛岃繑鍥炴妱琚増涓鍒や负閲嶅鐨勫瓧绗︽�绘暟銆�
+     *
+     * @param original 鍘熸枃鍙ュ瓙
+     * @param copied   鎶勮鐗堝彞瀛�
+     * @return 閲嶅瀛楃鏁�
+     */
+    private int matchSentences(List&lt;int[]&gt; original, List&lt;int[]&gt; copied) {
+<span class="fc" id="L105">        NGramIndex index = new NGramIndex();</span>
+<span class="fc" id="L106">        Set&lt;Integer&gt; originalSingleChars = new HashSet&lt;Integer&gt;();</span>
+<span class="fc" id="L107">        int maxOriginalLength = 1;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        for (int id = 0; id &lt; original.size(); id++) {</span>
+<span class="fc" id="L109">            int[] sentence = original.get(id);</span>
+<span class="fc" id="L110">            index.add(id, sentence);</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            if (sentence.length == 1) {</span>
+<span class="nc" id="L112">                originalSingleChars.add(Integer.valueOf(sentence[0]));</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            } else if (sentence.length &gt; maxOriginalLength) {</span>
+<span class="fc" id="L114">                maxOriginalLength = sentence.length;</span>
+            }
+        }
+<span class="fc" id="L117">        int sentenceCount = original.size();</span>
+        // 鍛戒腑璁℃暟涓庢椂闂存埑鏁扮粍锛氱敤閫掑鐨勬椂闂存埑浠ｆ浛銆屾瘡娆℃煡璇㈤兘娓呴浂銆嶏紝閬垮厤 O(鍙ュ瓙鏁�) 鐨勯噸澶嶅垵濮嬪寲
+<span class="fc" id="L119">        int[] hitCount = new int[sentenceCount];</span>
+<span class="fc" id="L120">        int[] stamp = new int[sentenceCount];</span>
+<span class="fc" id="L121">        CandidateBag candidates = new CandidateBag();</span>
+        // 瀛楃粍鐨勮瘝棰戜笂闄愰殢鏂囨。瑙勬ā鑷�傚簲锛氭枃妗ｈ秺澶э紝銆屽父瑙佸瓧缁勩�嶇殑鍒ゅ畾闃堝�艰秺楂橈紝
+        // 浠庤�屽湪淇濇寔鍙洖鐜囩殑鍚屾椂杩囨护鎺夊尯鍒嗗害鏋佷綆鐨勫瓧缁�
+<span class="fc" id="L124">        int dfLimit = Math.max(POSTINGS_DF_MIN, sentenceCount / 50);</span>
+
+<span class="fc" id="L126">        LcsMatcher matcher = new LcsMatcher(Math.max(maxOriginalLength, maxLength(copied)));</span>
+        // 澶嶇敤鐨勭紦鍐插尯锛氶伩鍏嶆瘡澶勭悊涓�鍙ラ兘鏂板缓鏁扮粍
+<span class="fc" id="L128">        int[] orderBuffer = new int[SentenceSegmenter.MAX_SENTENCE_LENGTH];</span>
+<span class="fc" id="L129">        int[] frequencyBuffer = new int[SentenceSegmenter.MAX_SENTENCE_LENGTH];</span>
+<span class="fc" id="L130">        int[] sortedBuffer = new int[MAX_CANDIDATES];</span>
+<span class="fc" id="L131">        int[] bucketBuffer = new int[SentenceSegmenter.MAX_SENTENCE_LENGTH + 2];</span>
+<span class="fc" id="L132">        int[] startBuffer = new int[SentenceSegmenter.MAX_SENTENCE_LENGTH + 2];</span>
+<span class="fc" id="L133">        int matched = 0;</span>
+<span class="fc" id="L134">        int stampCounter = 0;</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        for (int i = 0; i &lt; copied.size(); i++) {</span>
+<span class="fc" id="L136">            stampCounter++;</span>
+<span class="fc" id="L137">            matched += bestMatch(copied.get(i), original, index, matcher, originalSingleChars,</span>
+                    hitCount, stamp, stampCounter, dfLimit, candidates,
+                    orderBuffer, frequencyBuffer, sortedBuffer, bucketBuffer, startBuffer);
+        }
+<span class="fc" id="L141">        return matched;</span>
+    }
+
+    /**
+     * 鍦ㄥ師鏂囦腑涓烘妱琚増鐨勪竴涓彞瀛愬鎵炬渶鍖归厤鐨勫彞瀛愩��
+     *
+     * @param sentence            鎶勮鐗堝彞瀛�
+     * @param original            鍘熸枃鍙ュ瓙
+     * @param index               鍘熸枃鐨勪簩鍏冨瓧缁勫�掓帓绱㈠紩
+     * @param matcher             鍙鐢ㄧ殑 LCS 璁＄畻鍣�
+     * @param originalSingleChars 鍘熸枃涓嚭鐜拌繃鐨勫崟瀛楅泦鍚堬紝鐢ㄤ簬澶勭悊闀垮害灏忎簬 2 鐨勫彞瀛�
+     * @param hitCount            鍛戒腑璁℃暟鏁扮粍锛堜笌 stamp 閰嶅悎浣跨敤锛�
+     * @param stamp               鏃堕棿鎴虫暟缁勶紝鏍囪鏌愪釜鍊欓�夋槸鍚﹀睘浜庢湰杞�
+     * @param stampCounter        鏈疆鏃堕棿鎴�
+     * @param dfLimit             鏈疆鍏佽鐨勫瓧缁勬渶澶ц瘝棰�
+     * @param candidates          澶嶇敤鐨勫�欓�夐泦鍚�
+     * @param orderBuffer         澶嶇敤鐨勫瓧缁勯『搴忕紦鍐插尯
+     * @param frequencyBuffer     澶嶇敤鐨勫瓧缁勮瘝棰戠紦鍐插尯
+     * @param sortedBuffer        澶嶇敤鐨勫�欓�夋帓搴忕粨鏋滅紦鍐插尯
+     * @param bucketBuffer        澶嶇敤鐨勮鏁版帓搴忔《
+     * @param startBuffer         澶嶇敤鐨勮鏁版帓搴忚捣濮嬩綅缃暟缁�
+     * @return 璇ュ彞琚垽涓洪噸澶嶇殑瀛楃鏁�
+     */
+    private int bestMatch(int[] sentence, List&lt;int[]&gt; original, NGramIndex index,
+                          LcsMatcher matcher, Set&lt;Integer&gt; originalSingleChars,
+                          int[] hitCount, int[] stamp, int stampCounter, int dfLimit,
+                          CandidateBag candidates, int[] orderBuffer, int[] frequencyBuffer,
+                          int[] sortedBuffer, int[] bucketBuffer, int[] startBuffer) {
+<span class="fc" id="L169">        int length = sentence.length;</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">        if (length &lt;= 0) {</span>
+<span class="nc" id="L171">            return 0;</span>
+        }
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">        if (length == 1) {</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            return originalSingleChars.contains(Integer.valueOf(sentence[0])) ? 1 : 0;</span>
+        }
+<span class="fc" id="L176">        int totalGrams = length - 1;</span>
+<span class="fc" id="L177">        candidates.reset();</span>
+<span class="fc" id="L178">        int known = collect(sentence, index, hitCount, stamp, stampCounter, dfLimit, candidates,</span>
+                orderBuffer, frequencyBuffer);
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        if (candidates.size == 0) {</span>
+            // 楂橀瀛楃粍琚繃婊ゅ悗娌℃湁鍊欓�夛紝閫�鍖栦负涓嶈繃婊ゅ啀璇曚竴娆�
+<span class="fc" id="L182">            candidates.reset();</span>
+<span class="fc" id="L183">            known = collect(sentence, index, hitCount, stamp, stampCounter, Integer.MAX_VALUE, candidates,</span>
+                    orderBuffer, frequencyBuffer);
+        }
+<span class="fc bfc" id="L186" title="All 2 branches covered.">        if (candidates.size == 0) {</span>
+<span class="fc" id="L187">            return 0;</span>
+        }
+        // 灏氭湭鎵弿鍒扮殑瀛楃粍鏈�澶氳繕鑳戒负鏌愪釜鍊欓�夊啀璐＄尞 unknown 娆″懡涓紝
+        // 鎹寰楀埌涓ユ牸鎴愮珛鐨勪笂鐣岋細LCS &lt;= 鍛戒腑鏁� + 鏈粺璁″瓧缁勬暟 + 1
+<span class="fc" id="L191">        int unknown = totalGrams - known;</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (unknown &lt; 0) {</span>
+<span class="nc" id="L193">            unknown = 0;</span>
+        }
+<span class="fc" id="L195">        orderByHitsDescending(candidates, hitCount, sortedBuffer, bucketBuffer, startBuffer);</span>
+<span class="fc" id="L196">        int best = 0;</span>
+<span class="fc" id="L197">        int examined = 0;</span>
+<span class="pc bpc" id="L198" title="1 of 4 branches missed.">        for (int k = 0; k &lt; candidates.size &amp;&amp; examined &lt; MAX_LCS_PER_SENTENCE; k++) {</span>
+<span class="fc" id="L199">            int id = sortedBuffer[k];</span>
+<span class="fc" id="L200">            int[] candidate = original.get(id);</span>
+<span class="fc" id="L201">            int minLength = Math.min(candidate.length, length);</span>
+            // 鍊欓�夊凡鎸夊懡涓暟闄嶅簭鎺掑垪锛屽悗闈㈢殑鍛戒腑鏁板彧浼氭洿灏忥紝鍥犳杩欓噷鍙互鐩存帴缁堟
+<span class="fc" id="L203">            int upperBound = Math.min(minLength, hitCount[id] + unknown + 1);</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            if (upperBound &lt;= best) {</span>
+<span class="fc" id="L205">                break;</span>
+            }
+<span class="pc bpc" id="L207" title="2 of 4 branches missed.">            if (candidate.length &gt; (long) length * LENGTH_RATIO</span>
+                    || length &gt; (long) candidate.length * LENGTH_RATIO) {
+<span class="nc" id="L209">                continue;</span>
+            }
+<span class="fc" id="L211">            examined++;</span>
+            int value;
+<span class="fc bfc" id="L213" title="All 4 branches covered.">            if (candidate.length == length &amp;&amp; Arrays.equals(candidate, sentence)) {</span>
+                // 瀹屽叏鐩稿悓鐨勫彞瀛愮洿鎺ョ煭璺紝鐪佹帀涓�鏁存 LCS
+<span class="fc" id="L215">                value = length;</span>
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">            } else if ((long) candidate.length * length &gt; LcsMatcher.MAX_CELLS) {</span>
+                // 瑙勬ā杩囧ぇ鏃堕��鍖栦负涓婄晫浼拌锛屼繚璇佷笉浼氬洜鍗曟姣旇緝鑰岃秴鏃�
+<span class="nc" id="L218">                value = upperBound;</span>
+            } else {
+<span class="fc" id="L220">                value = matcher.length(sentence, candidate);</span>
+            }
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">            if (value &gt; best) {</span>
+<span class="fc" id="L223">                best = value;</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">                if (best == minLength) {</span>
+                    // 宸茬粡瀹屽叏鍖呭惈锛屾棤闇�缁х画姣旇緝
+<span class="fc" id="L226">                    break;</span>
+                }
+            }
+        }
+<span class="fc" id="L230">        return best;</span>
+    }
+
+    /**
+     * 缁熻鎶勮鐗堝彞瀛愬湪鍘熸枃鍚勫彞涓殑鍛戒腑瀛楃粍鏁般��
+     *
+     * @param sentence     鎶勮鐗堝彞瀛�
+     * @param index        鍘熸枃鍊掓帓绱㈠紩
+     * @param hitCount     鍛戒腑璁℃暟鏁扮粍
+     * @param stamp        鏃堕棿鎴虫暟缁�
+     * @param stampCounter 鏈疆鏃堕棿鎴�
+     * @param dfLimit      鍏佽鐨勫瓧缁勬渶澶ц瘝棰�
+     * @param candidates   鍊欓�夐泦鍚堬紝棣栨鍛戒腑鐨勫彞瀛愮紪鍙蜂細琚拷鍔犺繘鏉�
+     * @param orderBuffer  澶嶇敤鐨勫瓧缁勯『搴忕紦鍐插尯
+     * @param frequencyBuffer 澶嶇敤鐨勫瓧缁勮瘝棰戠紦鍐插尯
+     * @return 宸茬粡銆屽畬鏁存壂鎻忚繃鍊掓帓琛ㄣ�嶇殑瀛楃粍鏁伴噺锛涘畠鍐冲畾浜嗕笂鐣岀殑鏉剧揣绋嬪害
+     */
+    private int collect(int[] sentence, NGramIndex index, int[] hitCount, int[] stamp,
+                        int stampCounter, int dfLimit, CandidateBag candidates,
+                        int[] orderBuffer, int[] frequencyBuffer) {
+        // 绗竴姝ワ細缁熻姣忎釜瀛楃粍鐨勮瘝棰戯紝骞舵寜璇嶉鍗囧簭鎺掑簭銆�
+        // 绋�鏈夊瓧缁勶紙濡傘�岄渶姹傝鏍笺�嶏級鐨勫�掓帓琛ㄥ緢鐭紝鍛戒腑瀹冪殑鍙ュ瓙鏋佸彲鑳藉氨鏄噸澶嶆簮锛�
+        // 甯歌瀛楃粍锛堝銆岀殑鏄�嶏級鐨勫�掓帓琛ㄥ緢闀匡紝鏃㈡參鍙堝嚑涔庢病鏈夊尯鍒嗗害銆�
+        // 鎸夎瘝棰戝崌搴忓鐞嗭紝鍙互璁╂湁闄愮殑璁块棶棰勭畻浼樺厛鑺卞湪楂樹环鍊肩壒寰佷笂銆�
+<span class="fc" id="L254">        int totalGrams = sentence.length - 1;</span>
+<span class="fc" id="L255">        int gramCount = 0;</span>
+        // 鍊掓帓琛ㄤ腑涓嶅瓨鍦ㄧ殑瀛楃粍鏄�屽凡鐭ヤ笉鍚�嶇殑锛屽彲浠ョ洿鎺ョ畻浣滃凡鎵弿
+<span class="fc" id="L257">        int known = 0;</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">        for (int i = 0; i &lt; totalGrams; i++) {</span>
+<span class="fc" id="L259">            NGramIndex.IntList postings = index.postingsOf(sentence[i], sentence[i + 1]);</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">            if (postings == null) {</span>
+<span class="fc" id="L261">                known++;</span>
+<span class="fc" id="L262">                continue;</span>
+            }
+<span class="fc" id="L264">            int postingSize = postings.size();</span>
+<span class="fc bfc" id="L265" title="All 2 branches covered.">            if (postingSize &gt; dfLimit) {</span>
+<span class="fc" id="L266">                continue;</span>
+            }
+<span class="fc" id="L268">            int position = gramCount;</span>
+<span class="fc bfc" id="L269" title="All 4 branches covered.">            while (position &gt; 0 &amp;&amp; frequencyBuffer[position - 1] &gt; postingSize) {</span>
+<span class="fc" id="L270">                frequencyBuffer[position] = frequencyBuffer[position - 1];</span>
+<span class="fc" id="L271">                orderBuffer[position] = orderBuffer[position - 1];</span>
+<span class="fc" id="L272">                position--;</span>
+            }
+<span class="fc" id="L274">            frequencyBuffer[position] = postingSize;</span>
+<span class="fc" id="L275">            orderBuffer[position] = i;</span>
+<span class="fc" id="L276">            gramCount++;</span>
+        }
+
+        // 绗簩姝ワ細鎸夋帓濂界殑椤哄簭绱Н鍊欓�夊彞涓庡懡涓鏁�
+<span class="fc" id="L280">        int visits = 0;</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        for (int g = 0; g &lt; gramCount; g++) {</span>
+<span class="fc" id="L282">            int i = orderBuffer[g];</span>
+<span class="fc" id="L283">            NGramIndex.IntList postings = index.postingsOf(sentence[i], sentence[i + 1]);</span>
+<span class="fc" id="L284">            int postingSize = postings.size();</span>
+<span class="fc bfc" id="L285" title="All 2 branches covered.">            if (visits + postingSize &gt; MAX_POSTINGS_VISITS) {</span>
+                // 棰勭畻涓嶈冻鏃朵笉鍐嶆壂鎻忥紝涔熶笉鎶婅瀛楃粍绠椾綔宸叉壂鎻忥紝淇濊瘉涓婄晫渚濈劧鎴愮珛
+<span class="fc" id="L287">                return known;</span>
+            }
+<span class="fc" id="L289">            visits += postingSize;</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">            for (int k = 0; k &lt; postingSize; k++) {</span>
+<span class="fc" id="L291">                int id = postings.get(k);</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">                if (stamp[id] != stampCounter) {</span>
+<span class="fc" id="L293">                    stamp[id] = stampCounter;</span>
+<span class="fc" id="L294">                    hitCount[id] = 0;</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">                    if (candidates.size &lt; MAX_CANDIDATES) {</span>
+<span class="fc" id="L296">                        candidates.add(id);</span>
+                    }
+                }
+<span class="fc" id="L299">                hitCount[id]++;</span>
+            }
+<span class="fc" id="L301">            known++;</span>
+        }
+<span class="fc" id="L303">        return known;</span>
+    }
+
+    /**
+     * 鐢ㄨ鏁版帓搴忔妸鍊欓�夊彞鎸夊懡涓暟浠庡ぇ鍒板皬鎺掑垪銆�
+     *
+     * &lt;p&gt;鍛戒腑鏁颁竴瀹氫笉瓒呰繃鍙ュ瓙鐨勫瓧缁勬�绘暟锛屽彇鍊艰寖鍥村緢灏忥紝鍥犳璁℃暟鎺掑簭鏄嚎鎬х殑锛�
+     * 姣旈�氱敤鐨勬瘮杈冩帓搴忔洿蹇紝涔熶笉浜х敓浠讳綍涓存椂瀵硅薄銆�&lt;/p&gt;
+     *
+     * @param candidates  鍊欓�夐泦鍚�
+     * @param hitCount    鍛戒腑璁℃暟鏁扮粍
+     * @param sorted      杈撳嚭缂撳啿鍖猴紝瀛樻斁鎺掑ソ搴忕殑鍊欓�夌紪鍙�
+     * @param bucket      璁℃暟妗剁紦鍐插尯
+     * @param start       璧峰浣嶇疆缂撳啿鍖�
+     */
+    private void orderByHitsDescending(CandidateBag candidates, int[] hitCount,
+                                       int[] sorted, int[] bucket, int[] start) {
+<span class="fc" id="L320">        int[] ids = candidates.ids;</span>
+<span class="fc" id="L321">        int size = candidates.size;</span>
+<span class="fc" id="L322">        int maxHits = 0;</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">        for (int k = 0; k &lt; size; k++) {</span>
+<span class="fc" id="L324">            int hits = hitCount[ids[k]];</span>
+<span class="fc" id="L325">            bucket[hits]++;</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">            if (hits &gt; maxHits) {</span>
+<span class="fc" id="L327">                maxHits = hits;</span>
+            }
+        }
+<span class="fc" id="L330">        int position = 0;</span>
+<span class="fc bfc" id="L331" title="All 2 branches covered.">        for (int hits = maxHits; hits &gt;= 0; hits--) {</span>
+<span class="fc" id="L332">            start[hits] = position;</span>
+<span class="fc" id="L333">            position += bucket[hits];</span>
+        }
+<span class="fc bfc" id="L335" title="All 2 branches covered.">        for (int k = 0; k &lt; size; k++) {</span>
+<span class="fc" id="L336">            int id = ids[k];</span>
+<span class="fc" id="L337">            int hits = hitCount[id];</span>
+<span class="fc" id="L338">            sorted[start[hits]++] = id;</span>
+        }
+        // 娓呯┖璁℃暟妗讹紝渚涗笅涓�涓彞瀛愬鐢�
+<span class="fc bfc" id="L341" title="All 2 branches covered.">        for (int hits = 0; hits &lt;= maxHits; hits++) {</span>
+<span class="fc" id="L342">            bucket[hits] = 0;</span>
+        }
+<span class="fc" id="L344">    }</span>
+
+    /**
+     * @param sentences 鍙ュ瓙鍒楄〃
+     * @return 鏈�闀垮彞瀛愮殑鐗瑰緛瀛楃鏁�
+     */
+    private static int maxLength(List&lt;int[]&gt; sentences) {
+<span class="fc" id="L351">        int max = 1;</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">        for (int i = 0; i &lt; sentences.size(); i++) {</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">            if (sentences.get(i).length &gt; max) {</span>
+<span class="fc" id="L354">                max = sentences.get(i).length;</span>
+            }
+        }
+<span class="fc" id="L357">        return max;</span>
+    }
+
+    /**
+     * 澶嶇敤鐨勫�欓�夊彞闆嗗悎銆傜敤鍙闀挎暟缁勪唬鏇� {@code ArrayList&lt;Integer&gt;}锛岄伩鍏嶈绠变笌鍙嶅鍒嗛厤銆�
+     */
+<span class="fc" id="L363">    private static final class CandidateBag {</span>
+
+<span class="fc" id="L365">        private int[] ids = new int[16];</span>
+        private int size;
+
+        void reset() {
+<span class="fc" id="L369">            size = 0;</span>
+<span class="fc" id="L370">        }</span>
+
+        void add(int id) {
+<span class="fc bfc" id="L373" title="All 2 branches covered.">            if (size == ids.length) {</span>
+<span class="fc" id="L374">                ids = Arrays.copyOf(ids, ids.length * 2);</span>
+            }
+<span class="fc" id="L376">            ids[size++] = id;</span>
+<span class="fc" id="L377">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
