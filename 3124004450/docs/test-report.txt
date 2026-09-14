@@ -51,6 +51,7 @@
 │  │  ├─ 全角半角与大小写差异不影响结果 ✔
 │  │  ├─ 两篇文章完全相同时重复率为 1.00 ✔
 │  │  ├─ 抄袭版在原文基础上增加内容时，重复率仍然很高 ✔
+│  │  ├─ 抄袭句跨越原文句边界时仍然能被匹配 ✔
 │  │  ├─ 抄袭版替换少量字词后，重复率下降但仍然是正数 ✔
 │  │  └─ 抄袭版为空时重复率为 0.00 ✔
 │  └─ TextFileReaderTest ✔
@@ -63,18 +64,18 @@
 │     └─ 路径为空时抛出 E002 ✔
 └─ JUnit Vintage ✔
 
-Test run finished after 5277 ms
+Test run finished after 5355 ms
 [        11 containers found      ]
 [         0 containers skipped    ]
 [        11 containers started    ]
 [         0 containers aborted    ]
 [        11 containers successful ]
 [         0 containers failed     ]
-[        52 tests found           ]
+[        53 tests found           ]
 [         0 tests skipped         ]
-[        52 tests started         ]
+[        53 tests started         ]
 [         0 tests aborted         ]
-[        52 tests successful      ]
+[        53 tests successful      ]
 [         0 tests failed          ]
 
 
