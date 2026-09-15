@@ -1,7 +1,7 @@
 # 性能分析与改进记录
 
 测试环境：Windows 10 64 位，JDK 1.8.0_202（64 位 HotSpot）。
-基准数据由 `tools/Benchmark.java` 用固定随机种子生成，保证每次运行完全一致；
+基准数据由 `tools/java/com/zyy/papercheck/Benchmark.java` 用固定随机种子生成，保证每次运行完全一致；
 真实数据校验使用课堂下发的测试文本（`samples/official/`）。
 
 ## 一、基准测试：两种实现的耗时对比
@@ -129,14 +129,15 @@ run-benchmark.bat
 采样热点：
 
 ```bat
-java -Dfile.encoding=UTF-8 -cp build\classes com.zyy.papercheck.ProfileTarget 1000000 400
+run-profile.bat 1000000 60
 ```
 
-然后在程序运行期间用 `jstack` 反复抓取线程栈即可得到上面的分布。
+然后在程序运行期间用 `jstack` 反复抓取线程栈，或者用 VisualVM / IntelliJ IDEA Profiler
+附加到该 JVM 上做 CPU 采样，即可得到上面的分布。
 
 真实数据校验：
 
 ```bat
-java -Dfile.encoding=UTF-8 -Xmx1536m -cp build\classes;..\tools com.zyy.papercheck.OfficialDiag ^
+java -Dfile.encoding=UTF-8 -Xmx1536m -cp build\classes com.zyy.papercheck.OfficialDiag ^
     samples\official\orig.txt samples\official\orig_0.8_del.txt
 ```

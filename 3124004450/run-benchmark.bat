@@ -14,7 +14,7 @@ dir /s /b src\main\java\*.java > build\sources.txt
 "%JAVAC%" -encoding UTF-8 -d build\classes @build\sources.txt
 if errorlevel 1 exit /b 1
 
-"%JAVAC%" -encoding UTF-8 -cp build\classes -d build\classes tools\Benchmark.java
+"%JAVAC%" -encoding UTF-8 -cp build\classes -d build\classes tools\java\com\zyy\papercheck\Benchmark.java
 if errorlevel 1 exit /b 1
 
 "%JAVA%" -Dfile.encoding=UTF-8 -cp build\classes com.zyy.papercheck.Benchmark

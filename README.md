@@ -17,14 +17,15 @@ PaperCheck/
     ├── src/main/java/...       # 程序源码
     ├── src/test/java/...       # 单元测试
     ├── samples/                # 自测样例数据
-    ├── tools/                  # 性能基准测试与采样负载（非程序主体）
+    ├── tools/java/             # 性能基准与采样负载（非程序主体，IDEA 中已标记为源码根）
     ├── docs/                   # 覆盖率报告、测试报告、性能分析
     ├── lib/                    # 单元测试所需的第三方 jar
     ├── main.jar                # 编译好的可执行程序
     ├── PSP.md                  # PSP 表格（预估 / 实际）
     ├── build.bat               # 一键编译打包
     ├── run-tests.bat           # 一键跑单元测试与覆盖率
-    └── run-benchmark.bat       # 一键跑性能基准
+    ├── run-benchmark.bat       # 一键跑性能基准
+    └── run-profile.bat         # 一键启动可采样的分析负载
 ```
 
 ## 运行方式
