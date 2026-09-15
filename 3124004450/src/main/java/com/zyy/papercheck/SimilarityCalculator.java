@@ -398,9 +398,7 @@ public final class SimilarityCalculator {
             sorted[start[hits]++] = id;
         }
         // 清空计数桶，供下一个句子复用
-        for (int hits = 0; hits <= maxHits; hits++) {
-            bucket[hits] = 0;
-        }
+        Arrays.fill(bucket, 0, maxHits + 1, 0);
     }
 
     /**

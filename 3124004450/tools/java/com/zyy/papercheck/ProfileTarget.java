@@ -34,11 +34,11 @@ public final class ProfileTarget {
         for (int i = 0; i < rounds; i++) {
             double rate = calculator.calculate(pair[0], pair[1]);
             if (i == 0) {
-                System.out.println(String.format(Locale.ROOT, "重复率=%.4f", Double.valueOf(rate)));
+                System.out.println(String.format(Locale.ROOT, "重复率=%.4f", rate));
             }
         }
         long millis = (System.nanoTime() - start) / 1000000L;
         System.out.println(String.format(Locale.ROOT, "共 %d 轮，总耗时 %d ms，平均 %d ms/轮",
-                Integer.valueOf(rounds), Long.valueOf(millis), Long.valueOf(millis / rounds)));
+                rounds, millis, millis / rounds));
     }
 }

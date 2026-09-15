@@ -63,7 +63,7 @@ public final class Benchmark {
         long start = System.nanoTime();
         double rate = naive(pair[0], pair[1]);
         long millis = (System.nanoTime() - start) / 1000000L;
-        System.out.println(millis + "," + String.format(Locale.ROOT, "%.4f", Double.valueOf(rate)));
+        System.out.println(millis + "," + String.format(Locale.ROOT, "%.4f", rate));
     }
 
     /**
@@ -83,10 +83,10 @@ public final class Benchmark {
             double rate = new SimilarityCalculator().calculate(original, copied);
             System.out.println(String.format(Locale.ROOT,
                     "%d,%s,%d,%s",
-                    Integer.valueOf(sizes[i]),
+                    sizes[i],
                     naive,
-                    Long.valueOf(fast),
-                    String.format(Locale.ROOT, "%.4f", Double.valueOf(rate))));
+                    fast,
+                    String.format(Locale.ROOT, "%.4f", rate)));
         }
     }
 

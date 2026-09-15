@@ -75,8 +75,8 @@ public final class TextFileReader {
         if (file.length() > MAX_FILE_BYTES) {
             String message = String.format(Locale.ROOT,
                     "%s 体积 %.1f MB，超过上限 %d MB: %s",
-                    role, Double.valueOf(file.length() / 1048576.0),
-                    Long.valueOf(MAX_FILE_BYTES / 1048576L), path);
+                    role, file.length() / 1048576.0,
+                    MAX_FILE_BYTES / 1048576L, path);
             throw new PaperCheckException(PaperCheckException.CODE_FILE_TOO_LARGE, message);
         }
         return file;

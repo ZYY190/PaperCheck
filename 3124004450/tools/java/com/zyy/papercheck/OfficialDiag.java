@@ -46,7 +46,7 @@ public final class OfficialDiag {
 
         System.out.println(String.format(Locale.ROOT,
                 "%s  本实现=%.4f  句级暴力精确解=%.4f  全文LCS=%.4f  (原文句=%d 抄袭句=%d)",
-                Paths.get(args[1]).getFileName(), Double.valueOf(actual), Double.valueOf(brute),
-                Double.valueOf(wholeRate), Integer.valueOf(original.size()), Integer.valueOf(copied.size())));
+                Paths.get(args[1]).getFileName(), actual, brute,
+                wholeRate, original.size(), copied.size()));
     }
 }

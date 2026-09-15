@@ -50,7 +50,7 @@ public final class Main {
             String original = TextFileReader.read(args[0], "原文文件");
             String copied = TextFileReader.read(args[1], "抄袭版论文文件");
             double rate = new SimilarityCalculator().calculate(original, copied);
-            String answer = String.format(Locale.ROOT, "%.2f", Double.valueOf(rate));
+            String answer = String.format(Locale.ROOT, "%.2f", rate);
             TextFileWriter.write(args[2], answer);
             out.println(answer);
             return 0;
